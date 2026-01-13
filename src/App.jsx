@@ -25,10 +25,6 @@ const App = () => {
     }
     ).catch(error => console.error(`Unable to get initial server state`, error))
 
-    // Test get persons from our own API
-    axios.get(`http://localhost:3001/api/persons`).then(response => {
-      console.log('Response from server: ', response)
-    }).catch(error => console.log(`Error from server: `, error))
   }, [])
 
   const addName = (event) => {
