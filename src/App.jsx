@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Filter from './Components/Filter'
 import PersonList from './Components/PersonList'
-import noteService from './Services/phonebookService'
+import phonebookService from './Services/phonebookService'
 import Notification from './Components/Notification'
 import axios from 'axios'
 
@@ -19,7 +19,7 @@ const App = () => {
 
 
     // Retrieve the initial DB state from the server
-    noteService.getAll().then(response => {
+    phonebookService.getAll().then(response => {
       console.log('Retrieved initial records from server')
       setPersons(response.data)
     }
@@ -56,10 +56,10 @@ const App = () => {
       }
 
       
-      noteService.update(oldPerson.id, newPerson)
+      phonebookService.update(oldPerson._id, newPerson)
         .then(response => {
           const updatedPerson = response.data
-          setPersons(prev => prev.map(p => p.id === updatedPerson.id ? updatedPerson : p))
+          setPersons(prev => prev.map(p => p._id === updatedPerson._id ? updatedPerson : p))
           setNewName('')
           setNewNumber('')
           setNotification({message: `${updatedPerson.name}'s number has been updated`, isError: false})
@@ -68,7 +68,8 @@ const App = () => {
         })
         .catch(error => {
          console.error('Update failed', error)
-         setNotification({message: `${newPerson.name} no longer exists on server`, isError: true})
+         setNotification({message: `Unable to update user`, isError: true})
+         setTimeout(() => setNotification({message: '', isError: false}), 5000)
       })
 
       return
@@ -85,7 +86,7 @@ const App = () => {
     
     
     // Create the user on the server and update clientside
-    noteService.create(newPerson).then(response => {
+    phonebookService.create(newPerson).then(response => {
       const person = response.data
       setPersons(prev => prev.concat(person))
       setNewName('')
@@ -112,12 +113,16 @@ const App = () => {
       return
     }
 
-    const removedUser = persons.find(p => p.id === id)
+    const removedUser = persons.find(p => p._id === id)
+
+    console.log(`ID to remove`, id)
+    console.log(`Person to remove`, removedUser)
 
     // Delete user from server
-    noteService.remove(id).then(response => {
-      setPersons(prev => prev.filter(p => p.id !== removedUser.id))
-      console.log(`User ${removedUser.name} of ID ${removedUser.id} has been removed from server`)
+    phonebookService.remove(id).then(response => {
+      console.log(`DELETING USER`)
+      setPersons(prev => prev.filter(p => p._id !== removedUser._id))
+      console.log(`User ${removedUser.name} of ID ${removedUser._id} has been removed from server`)
       setNotification({message: `${removedUser.name} removed from Phonebook`, isError: false})
       setTimeout(() => setNotification({message: '', iserror: false}), 5000)
     })
@@ -168,6 +173,7 @@ const App = () => {
         <div>
           name: <input value={newName} onChange={handleNewNameChange}/>
         </div>
+      
         <div>
           number : <input value={newNumber} onChange={handleNewNumberChange}/>
         </div>

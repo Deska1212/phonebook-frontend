@@ -5,7 +5,7 @@ const PersonList = ({persons, removePerson}) => (
         {
             persons.map((person) => (
                 // Note: key needs to be in scope of the map that is creating the element
-                <Person key={person.name} person={person} onDeleteClick={() => removePerson(person.id)}/>
+                <Person key={person.name} person={person} onDeleteClick={() => removePerson(person._id)}/>
             ))
         }
     </ul>
